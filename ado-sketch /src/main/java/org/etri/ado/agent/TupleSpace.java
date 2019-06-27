@@ -30,12 +30,16 @@ import akka.cluster.ddata.Replicator.UpdateTimeout;
 import akka.cluster.ddata.Replicator.WriteAll;
 import akka.cluster.ddata.Replicator.WriteConsistency;
 import akka.cluster.ddata.Replicator.WriteMajority;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import akka.cluster.ddata.SelfUniqueAddress;
 import scala.Option;
 import scala.concurrent.duration.Duration;
 
 @SuppressWarnings("unchecked")
 public class TupleSpace <T extends Tuple> extends AbstractActor {
+	
+	private final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
 
 	// #read-write-majority
 	private final WriteConsistency writeMajority = new WriteMajority(Duration.create(3, SECONDS));
@@ -50,6 +54,15 @@ public class TupleSpace <T extends Tuple> extends AbstractActor {
 
 		public Put(KeyValue<String,T> tuple) {
 			this.tuple = tuple;
+		}
+		
+		private static class Context<T> {
+			private final KeyValue<String,T> tuple;
+			
+			private Context(KeyValue<String, T> tuple) {
+				this.tuple = tuple;
+			}
+			
 		}
 	}
 	
@@ -146,7 +159,8 @@ public class TupleSpace <T extends Tuple> extends AbstractActor {
 	}
 
 	private void receivePut(Put<T> p) {
-		Update<LWWMap<String,T>> update = new Update<>(m_dataKey, LWWMap.create(), writeAll,
+		Optional<Object> ctx = Optional.of(new Put.Context<T>(p.tuple));
+		Update<LWWMap<String,T>> update = new Update<>(m_dataKey, LWWMap.create(), writeAll, ctx,
 				space -> updateTuple(space, p.tuple));
 		m_replicator.tell(update, self());
 	}
@@ -197,7 +211,8 @@ public class TupleSpace <T extends Tuple> extends AbstractActor {
 
 	private Receive matchOther() {
 		return receiveBuilder().match(UpdateSuccess.class, u -> {
-			System.out.println("Update Success => " + u);
+			 Put.Context<Tuple> ctx = (org.etri.ado.agent.TupleSpace.Put.Context<Tuple>) u.getRequest().get();
+			 logger.info("updated - " + ctx.tuple.getKey() + " : " + ctx.tuple.getValue());
 		}).match(UpdateTimeout.class, t -> {
 			// will eventually be replicated
 		}).match(UpdateFailure.class, f -> {

@@ -5,7 +5,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -37,11 +36,15 @@ import akka.cluster.ddata.Replicator.UpdateTimeout;
 import akka.cluster.ddata.Replicator.WriteAll;
 import akka.cluster.ddata.Replicator.WriteConsistency;
 import akka.cluster.ddata.SelfUniqueAddress;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import scala.Option;
 import scala.concurrent.duration.Duration;
 
 @SuppressWarnings("unchecked")
 public class AgentRegistry extends AbstractActor {
+	
+	private final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
 
 	private final static WriteConsistency writeMajority = new WriteAll(Duration.create(3, SECONDS));
 	private final static ReadConsistency readMajority = new ReadAll(Duration.create(3, SECONDS));
@@ -52,6 +55,16 @@ public class AgentRegistry extends AbstractActor {
 		
 		public Put(AgentInfo agent) {
 			this.agent = agent;
+		}
+		
+		private static class Context {
+			private final String type;
+			private final AgentInfo info;
+			
+			private Context(String type, AgentInfo info) {
+				this.type = type;
+				this.info = info;
+			}
 		}
 	}
 	
@@ -129,11 +142,13 @@ public class AgentRegistry extends AbstractActor {
 	}
 	
 	private void receivePut(Put cmd) {
-		Update<LWWMap<String,AgentInfo>> update1 = new Update<>(m_idToAgentKey, LWWMap.create(), writeMajority,
+		Optional<Object> ctx = Optional.of(new Put.Context("by id",  cmd.agent));
+		Update<LWWMap<String,AgentInfo>> update1 = new Update<>(m_idToAgentKey, LWWMap.create(), writeMajority, ctx,
 				map -> updateIdToAgents(map, cmd.agent));
 		m_replicator.tell(update1, self());
 		
-		Update<ORMultiMap<String,AgentInfo>> update2 = new Update<>(m_capaToAgentKey, ORMultiMap.create(), writeMajority,
+		ctx = Optional.of(new Put.Context("by capabilities",  cmd.agent));
+		Update<ORMultiMap<String,AgentInfo>> update2 = new Update<>(m_capaToAgentKey, ORMultiMap.create(), writeMajority, ctx,
 				map -> updateCapaToAgents(map, cmd.agent));
 		m_replicator.tell(update2, self());
 	}
@@ -279,7 +294,8 @@ public class AgentRegistry extends AbstractActor {
 
 	private Receive matchOther() {
 		return receiveBuilder().match(UpdateSuccess.class, u -> {
-			System.out.println("Update Success => " + u);
+			 Put.Context ctx = (Put.Context) u.getRequest().get();
+			 logger.info("registered " + ctx.type + " - " + ctx.info);
 		}).match(UpdateTimeout.class, t -> {
 			// will eventually be replicated
 		}).match(UpdateFailure.class, f -> {
