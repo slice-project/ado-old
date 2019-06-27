@@ -1,6 +1,5 @@
 package org.etri.ado.task;
 
-import org.apache.commons.lang3.tuple.Triple;
 import org.etri.ado.gateway.openai.OpenAI.Action;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
