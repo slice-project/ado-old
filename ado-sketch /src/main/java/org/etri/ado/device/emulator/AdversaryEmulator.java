@@ -13,7 +13,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
 
-public class RobotEmulator extends AbstractActor {
+public class AdversaryEmulator extends AbstractActor {
 		
 	private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 	
@@ -24,15 +24,24 @@ public class RobotEmulator extends AbstractActor {
 	private final float m_mass = 1.0f;
 	private final float m_dt = 0.1f;
 	private final float m_damping = 0.25f;
+	private final float m_max_speed = 1.0f;
+	
+	
 	private Color m_previous = Color.Init;
 
 	public static Props prop(Pair<Float, Float> loc) {
-		return Props.create(RobotEmulator.class, loc);
+		return Props.create(AdversaryEmulator.class, loc);
 	}
 	
-	public RobotEmulator(Pair<Float, Float> loc) {
+	public AdversaryEmulator(Pair<Float, Float> loc) {
 		m_locX = loc.getValue0();
 		m_locY = loc.getValue1();
+		
+		getContext().system().eventStream().publish(new AddLocation(Pair.with(m_locX, m_locY)));
+		log.info("publish[AddLocation({}, {}]", m_locX, m_locY);	
+		
+		getContext().system().eventStream().publish(new AddVelocity(Pair.with(m_velX, m_velY)));
+		log.info("publish[AddVelocity({}, {}]", m_velX, m_velY);		
 	}
 
 	@Override
@@ -53,6 +62,12 @@ public class RobotEmulator extends AbstractActor {
 		m_velY =  m_velY * ( 1 - m_damping );	
 		m_velY += ( force.delta.getValue1() / m_mass ) * m_dt;
 
+		double speed = Math.sqrt(m_velX * m_velX  + m_velY * m_velY);
+		if ( speed > m_max_speed ) {
+			m_velX = m_velX / (float)speed * m_max_speed;
+			m_velY = m_velY / (float)speed * m_max_speed;
+		}		
+		
 		getContext().system().eventStream().publish(new AddVelocity(Pair.with(m_velX, m_velY)));
 		log.info("publish[AddVelocity({}, {}]", m_velX, m_velY);
 		

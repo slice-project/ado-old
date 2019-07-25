@@ -19,8 +19,8 @@ public class VelocityUpdater extends AbstractActor {
 		}
 	}
 
-	public static Props props(AgentSystem system, String agentId) {
-		return Props.create(VelocityUpdater.class, system.getTupleSpace(), agentId);
+	public static Props props(AgentSystem system) {
+		return Props.create(VelocityUpdater.class, system.getTupleSpace(), system.getAgentId());
 	}
 
 	private final ActorRef m_tupleSpace;

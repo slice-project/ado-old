@@ -18,7 +18,6 @@ import org.javatuples.Pair;
 import com.google.protobuf.StringValue;
 
 import akka.actor.ActorRef;
-import akka.actor.Props;
 import akka.cluster.client.ClusterClient.SendToAll;
 import akka.pattern.Patterns;
 import scala.collection.Iterator;
@@ -27,10 +26,6 @@ import scala.collection.immutable.Set;
 public class ADOImpl implements ADO {
 	
 	private static final String ADO_PATH = "/user/ado/singleton";
-	
-	public static Props prop(ActorRef clusterClient) {
-		return Props.create(ADOImpl.class, clusterClient);
-	}
 	
 	private final ActorRef m_clusterClient;
 	private final Map<AgentInfo, AgentRef> m_agents;

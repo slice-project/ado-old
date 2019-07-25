@@ -173,7 +173,7 @@ public class TupleSpace <T extends Tuple> extends AbstractActor {
 	private Receive matchRemove() {
 		return receiveBuilder().match(Remove.class, this::receiveRemove)
 				.match(GetSuccess.class, this::isResponseToRemove,
-						g -> receiveRemoveGetSuccess((GetSuccess<LWWMap<String,T>>) g))
+						g -> receiveRemoveSuccess((GetSuccess<LWWMap<String,T>>) g))
 				.match(GetFailure.class, this::isResponseToRemove,
 						f -> receiveRemoveGetFailure((GetFailure<LWWMap<String,T>>) f))
 				.match(NotFound.class, this::isResponseToRemove, n -> {
@@ -188,7 +188,7 @@ public class TupleSpace <T extends Tuple> extends AbstractActor {
 		m_replicator.tell(new Replicator.Get<>(m_dataKey, readMajority, ctx), self());
 	}
 
-	private void receiveRemoveGetSuccess(GetSuccess<LWWMap<String,T>> g) {
+	private void receiveRemoveSuccess(GetSuccess<LWWMap<String,T>> g) {
 		Remove rm = (Remove) g.getRequest().get();
 		removeTuple(rm.key);
 	}
