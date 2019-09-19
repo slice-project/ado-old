@@ -31,6 +31,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
 import akka.pattern.Patterns;
+import scala.Option;
 import scala.concurrent.duration.FiniteDuration;
 
 public class ListenerScheduler extends AbstractActor {
@@ -46,9 +47,15 @@ public class ListenerScheduler extends AbstractActor {
 	private static final Tick s_tick = new Tick();
 	private final AgentSystem m_system;
 	private MultiLayerNetwork m_model;
-	private Cancellable m_task;
-	
+	private Cancellable m_task;	
 	private List<Function<CamelMessage,Action>> m_handlers = new ArrayList<Function<CamelMessage,Action>>();
+	
+	private Triplet<Float,Float,Float> agent_act;
+	private Pair<Float,Float> this_vel;
+	private Pair<Float,Float> this_loc;
+	private Pair<Float,Float> red_loc;
+	private Pair<Float,Float> green_loc;
+	private Pair<Float,Float> blue_loc;
 		
 	public ListenerScheduler(AgentSystem system) {
 		m_system = system;
@@ -69,6 +76,10 @@ public class ListenerScheduler extends AbstractActor {
 			
 			m_handlers.add(new MoveToXYActionBuilder());
 			m_system.getTupleSpace().tell(new SubscribeTo("agent0"), getSelf());
+			m_system.getTupleSpace().tell(new SubscribeTo("agent1"), getSelf());
+			m_system.getTupleSpace().tell(new SubscribeTo("red"), getSelf());
+			m_system.getTupleSpace().tell(new SubscribeTo("green"), getSelf());
+			m_system.getTupleSpace().tell(new SubscribeTo("blue"), getSelf());
 		}
 		catch ( Throwable e ) {
 			m_log.error(e, e.getMessage());
@@ -84,15 +95,47 @@ public class ListenerScheduler extends AbstractActor {
 	public Receive createReceive() {
 		ReceiveBuilder builder = ReceiveBuilder.create();
 		builder.match(Changed.class, this::receiveChanged);
-		builder.match(Tick.class, this::receiveTick);
+		builder.match(Tick.class, this::step);
 		builder.match(CamelMessage.class, this::receiveCommand);
 		builder.matchAny(this::unhandled);
 		
 		return builder.build();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void receiveChanged(Changed<LWWMap<String,Tuple>> g) {
-		System.out.println(g.key());
+		String key = g.key().id();
+		
+		if ( key.equals("agent0") ) {
+			Option<Tuple> changed = g.dataValue().get("action");
+			if ( changed.isEmpty() ) return;			
+			agent_act = (Triplet<Float, Float, Float>) changed.get();
+		}
+		else if ( key.equals("agent1") ) {
+			Option<Tuple> changed = g.dataValue().get("loc");
+			if ( changed.isEmpty() ) return;			
+			this_loc = (Pair<Float, Float>) changed.get();
+			
+			changed = g.dataValue().get("velocity");
+			if ( changed.isEmpty() ) return;
+			this_vel = (Pair<Float, Float>) changed.get();
+		}
+		else if ( key.equals("red") ) {
+			Option<Tuple> changed = g.dataValue().get("loc");
+			if ( changed.isEmpty() ) return;
+			red_loc = (Pair<Float, Float>) changed.get();
+		}
+		else if ( key.equals("green") ) {
+			Option<Tuple> changed = g.dataValue().get("loc");
+			if ( changed.isEmpty() ) return;
+			green_loc = (Pair<Float, Float>) changed.get();
+		}
+		else if ( key.equals("blue") ) {
+			Option<Tuple> changed = g.dataValue().get("loc");
+			if ( changed.isEmpty() ) return;
+			blue_loc = (Pair<Float, Float>) changed.get();
+		}
+		
 		System.out.println(g.dataValue());
 	}
 	
@@ -104,25 +147,25 @@ public class ListenerScheduler extends AbstractActor {
 		});		
 	}
 	
-	private void receiveTick(Tick tick) {
+	private void step(Tick tick) {
 		float[][] obs = new float[1][11];
 		
-		Pair<Float, Float> this_vel = getPair("agent1-velocity");
+//		Pair<Float, Float> this_vel = getPair("agent1-velocity");
 		if ( this_vel == null ) return;
 		
-		Pair<Float, Float> this_loc = getPair("agent1-loc");
+//		Pair<Float, Float> this_loc = getPair("agent1-loc");
 		if ( this_loc == null ) return;
 
-		Pair<Float, Float> red_loc = getPair("red-loc");
+//		Pair<Float, Float> red_loc = getPair("red-loc");
 		if ( red_loc == null ) return;			
 		
-		Pair<Float, Float> green_loc = getPair("green-loc");
+//		Pair<Float, Float> green_loc = getPair("green-loc");
 		if ( green_loc == null ) return;
 		
-		Pair<Float, Float> blue_loc = getPair("blue-loc");
+//		Pair<Float, Float> blue_loc = getPair("blue-loc");
 		if ( blue_loc == null ) return;
 		
-		Triplet<Float,Float,Float> agent_act = getTriplet("agent0-action");
+//		Triplet<Float,Float,Float> agent_act = getTriplet("agent0-action");
 		if ( agent_act == null ) return;
 		
 		obs[0][0] = this_vel.getValue0();
