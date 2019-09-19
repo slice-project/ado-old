@@ -1,7 +1,7 @@
-package org.etri.ado.task;
+package org.etri.ado.actor;
 
 import org.etri.ado.AgentSystem;
-import org.etri.ado.agent.TupleSpace;
+import org.etri.ado.agent.tuplespace.Put;
 import org.javatuples.KeyValue;
 import org.javatuples.Pair;
 
@@ -20,15 +20,14 @@ public class VelocityUpdater extends AbstractActor {
 	}
 
 	public static Props props(AgentSystem system) {
-		return Props.create(VelocityUpdater.class, system.getTupleSpace(), system.getAgentId());
+		return Props.create(VelocityUpdater.class, system.getTupleSpace());
 	}
 
 	private final ActorRef m_tupleSpace;
-	private final String m_key;
+	private final String m_key = "velocity";
 
-	public VelocityUpdater(ActorRef tupleSpace, String agentId) {
+	public VelocityUpdater(ActorRef tupleSpace) {
 		m_tupleSpace = tupleSpace;
-		m_key = agentId + "-velocity";
 	}
 
 	@Override
@@ -38,7 +37,7 @@ public class VelocityUpdater extends AbstractActor {
 
 	private void receiveAddLocation(AddVelocity add) {
 		KeyValue<String,Pair<Float,Float>> tuple = KeyValue.with(m_key, add.velocity);
-		TupleSpace.Put<Pair<Float,Float>> putCmd = new TupleSpace.Put<Pair<Float, Float>>(tuple);
+		Put<Pair<Float,Float>> putCmd = new Put<Pair<Float, Float>>(tuple);
 		m_tupleSpace.tell(putCmd, self());
 	}
 }

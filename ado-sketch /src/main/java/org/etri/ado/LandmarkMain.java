@@ -1,8 +1,8 @@
 package org.etri.ado;
 
+import org.etri.ado.actor.LocationUpdater;
 import org.etri.ado.device.emulator.LandmarkEmulator;
 import org.etri.ado.device.emulator.RobotLocalizer;
-import org.etri.ado.task.LocationUpdater;
 import org.javatuples.Pair;
 
 import com.typesafe.config.Config;

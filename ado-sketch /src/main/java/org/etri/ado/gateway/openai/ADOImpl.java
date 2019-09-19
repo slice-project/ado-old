@@ -7,8 +7,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import org.etri.ado.agent.AgentInfo;
-import org.etri.ado.agent.AgentRegistry;
-import org.etri.ado.agent.TupleSpace;
+import org.etri.ado.agent.registry.message.GetByCapabilities;
+import org.etri.ado.agent.registry.message.GetById;
+import org.etri.ado.agent.tuplespace.Get;
 import org.etri.ado.gateway.openai.OpenAI.AgentRef;
 import org.etri.ado.gateway.openai.OpenAI.Agents;
 import org.etri.ado.gateway.openai.OpenAI.Capabilities;
@@ -39,7 +40,7 @@ public class ADOImpl implements ADO {
 	@Override
 	public CompletionStage<AgentRef> getAgentById(StringValue in) {
 		String agentId = in.getValue();
-		SendToAll msg = new SendToAll(ADO_PATH, new AgentRegistry.GetById(agentId));
+		SendToAll msg = new SendToAll(ADO_PATH, new GetById(agentId));
 		CompletionStage<Object> getById = Patterns.ask(m_clusterClient, msg, Duration.ofSeconds(1000));
 		Optional<AgentInfo> agentInfo = null;
 		try {
@@ -64,7 +65,7 @@ public class ADOImpl implements ADO {
 	@Override
 	public CompletionStage<Agents> getAgentOf(Capabilities in) {
 		String[] capas = in.getCapabilitiesList().toArray(new String[in.getCapabilitiesCount()]);
-		SendToAll msg = new SendToAll(ADO_PATH, new AgentRegistry.GetByCapabilities(capas));
+		SendToAll msg = new SendToAll(ADO_PATH, new GetByCapabilities(capas));
 		CompletionStage<Object> getByCapa = 
 				Patterns.ask(m_clusterClient, msg, Duration.ofSeconds(1000));
 		
@@ -97,7 +98,7 @@ public class ADOImpl implements ADO {
 	public CompletionStage<Observation> getObservation(StringValue in) {
 		String obsId = in.getValue();
 		
-		SendToAll msg = new SendToAll(ADO_PATH, new TupleSpace.Get(obsId));
+		SendToAll msg = new SendToAll(ADO_PATH, new Get(obsId));
 		CompletionStage<Object> stage = Patterns.ask(m_clusterClient, msg, Duration.ofSeconds(1000));
 		Optional<Pair<Float, Float>> pair = null;
 		try {

@@ -1,9 +1,9 @@
 package org.etri.ado.device.emulator;
 
-import org.etri.ado.task.ActionCommander.MoveToXY;
-import org.etri.ado.task.ActionCommander.Speak;
-import org.etri.ado.task.ActionUpdater.AddAction;
-import org.etri.ado.task.LocationUpdater.AddLocation;
+import org.etri.ado.actor.ActionCommander.MoveToXY;
+import org.etri.ado.actor.ActionCommander.Speak;
+import org.etri.ado.actor.ActionUpdater.AddAction;
+import org.etri.ado.actor.LocationUpdater.AddLocation;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 
@@ -59,28 +59,28 @@ public class SpeakerEmulator extends AbstractActor {
 	
 	private void receiveSpeak(Speak word) {				
 		if ( word.target.getValue0() > 0.5 ) {
-			if ( m_previous == Color.Init || m_previous != Color.Green ) {
-				System.out.println("Go to the green Landmark!");
+			if ( m_previous == Color.Init || m_previous != Color.Red ) {
+				System.out.println("Go to the red Landmark!");
 				getContext().system().eventStream().publish(new AddAction(word.target));
 				log.info("publish[AddAction({}, {}, {}]", word.target.getValue0(), word.target.getValue1(), word.target.getValue2());
 			}
-			m_previous = Color.Green;
+			m_previous = Color.Red;
 		}
 		else if ( word.target.getValue1() > 0.5 ) {
+			if ( m_previous == Color.Init || m_previous != Color.Green ) {
+				System.out.println("Go to the green landmark!");
+				getContext().system().eventStream().publish(new AddAction(word.target));
+				log.info("publish[AddAction({}, {}, {}]", word.target.getValue0(), word.target.getValue1(), word.target.getValue2());				
+			}
+			m_previous = Color.Green;
+		}
+		else {
 			if ( m_previous == Color.Init || m_previous != Color.Blue ) {
 				System.out.println("Go to the blue landmark!");
 				getContext().system().eventStream().publish(new AddAction(word.target));
 				log.info("publish[AddAction({}, {}, {}]", word.target.getValue0(), word.target.getValue1(), word.target.getValue2());				
 			}
 			m_previous = Color.Blue;
-		}
-		else {
-			if ( m_previous == Color.Init || m_previous != Color.Red ) {
-				System.out.println("Go to the red landmark!");
-				getContext().system().eventStream().publish(new AddAction(word.target));
-				log.info("publish[AddAction({}, {}, {}]", word.target.getValue0(), word.target.getValue1(), word.target.getValue2());				
-			}
-			m_previous = Color.Red;
 		}
 	}
 }

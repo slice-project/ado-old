@@ -12,7 +12,7 @@ public abstract class AbstractAgent extends AbstractActor implements Agent {
 	
 	public AbstractAgent() {
 		m_settings = Settings.SettingsProvider.get(getContext().system());
-		m_info = new AgentInfo(m_settings.AGENT_ID, getSelf(), m_settings.CAPABILITIES);
+		m_info = new AgentInfo(m_settings.AGENT_ID, m_settings.AGENT_ROLE, getSelf(), m_settings.CAPABILITIES);
 	}
 	
 	public AgentInfo getAgentInfo() {

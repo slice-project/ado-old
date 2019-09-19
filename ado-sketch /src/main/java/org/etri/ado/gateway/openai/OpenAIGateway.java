@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
 import org.etri.ado.agent.AgentInfo;
-import org.etri.ado.agent.AgentRegistry;
+import org.etri.ado.agent.registry.message.GetAll;
 import org.etri.ado.gateway.openai.OpenAI.AgentRef;
 
 import com.typesafe.config.Config;
@@ -40,7 +40,7 @@ public class OpenAIGateway {
 		ActorRef clusterClient = system.actorOf(ClusterClient.props(ClusterClientSettings.create(system)),
 				"openAIGateway");
 		
-		SendToAll msg = new SendToAll("/user/ado/singleton", new AgentRegistry.GetAll());
+		SendToAll msg = new SendToAll("/user/ado/singleton", new GetAll());
 		CompletionStage<Object> getAll = Patterns.ask(clusterClient, msg, Duration.ofSeconds(1000));
 		AgentInfo[] agentInfos = (AgentInfo[])getAll.toCompletableFuture().get();
 		

@@ -1,4 +1,4 @@
-package org.etri.ado.task;
+package org.etri.ado.actor;
 
 import org.etri.ado.gateway.openai.OpenAI.Action;
 import org.javatuples.Pair;

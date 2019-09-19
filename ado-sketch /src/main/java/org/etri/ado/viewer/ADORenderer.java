@@ -64,7 +64,7 @@ public class ADORenderer extends AbstractActor {
 		m_world.update(agentInfos);
 		
 		m_world.getAgents().stream().forEach(agent -> {
-			Optional<Pair<Float,Float>> pair = m_ado.getObservation(agent.getId() + "-loc");
+			Optional<Pair<Float,Float>> pair = m_ado.getObservation(agent.getId(), "loc");
 			if ( !pair.isPresent() ) {
 				return;
 			}				

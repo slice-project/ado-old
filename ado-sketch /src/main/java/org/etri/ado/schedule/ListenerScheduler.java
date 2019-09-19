@@ -11,10 +11,12 @@ import java.util.function.Function;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.etri.ado.AgentSystem;
-import org.etri.ado.agent.TupleSpace;
+import org.etri.ado.agent.tuplespace.Get;
+import org.etri.ado.agent.tuplespace.SubscribeTo;
 import org.etri.ado.gateway.openai.OpenAI.Action;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
+import org.javatuples.Tuple;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.io.ClassPathResource;
@@ -23,6 +25,8 @@ import akka.actor.AbstractActor;
 import akka.actor.Cancellable;
 import akka.actor.Props;
 import akka.camel.CamelMessage;
+import akka.cluster.ddata.LWWMap;
+import akka.cluster.ddata.Replicator.Changed;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
@@ -64,6 +68,7 @@ public class ListenerScheduler extends AbstractActor {
 					getSelf());	
 			
 			m_handlers.add(new MoveToXYActionBuilder());
+			m_system.getTupleSpace().tell(new SubscribeTo("agent0"), getSelf());
 		}
 		catch ( Throwable e ) {
 			m_log.error(e, e.getMessage());
@@ -78,11 +83,17 @@ public class ListenerScheduler extends AbstractActor {
 	@Override
 	public Receive createReceive() {
 		ReceiveBuilder builder = ReceiveBuilder.create();
+		builder.match(Changed.class, this::receiveChanged);
 		builder.match(Tick.class, this::receiveTick);
 		builder.match(CamelMessage.class, this::receiveCommand);
 		builder.matchAny(this::unhandled);
 		
 		return builder.build();
+	}
+	
+	private void receiveChanged(Changed<LWWMap<String,Tuple>> g) {
+		System.out.println(g.key());
+		System.out.println(g.dataValue());
 	}
 	
 	private void receiveCommand( CamelMessage msg) {
@@ -141,13 +152,14 @@ public class ListenerScheduler extends AbstractActor {
 	@SuppressWarnings("unchecked")
 	private Pair<Float, Float> getPair(String obsId) {
 		
-		CompletionStage<Object> stage = Patterns.ask(m_system.getTupleSpace(), new TupleSpace.Get(obsId), Duration.ofSeconds(1));
+		CompletionStage<Object> stage = Patterns.ask(m_system.getTupleSpace(), new Get(obsId), Duration.ofSeconds(1));
 		Optional<Pair<Float, Float>> pair = null;
 		try {
 			pair = (Optional<Pair<Float, Float>>)stage.toCompletableFuture().get();
 		}
 		catch ( Throwable e ) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			return null;
 		}
 		
 		return pair.isPresent() ? pair.get() : null;
@@ -156,13 +168,14 @@ public class ListenerScheduler extends AbstractActor {
 	@SuppressWarnings("unchecked")
 	private Triplet<Float,Float,Float> getTriplet(String obsId) {
 		
-		CompletionStage<Object> stage = Patterns.ask(m_system.getTupleSpace(), new TupleSpace.Get(obsId), Duration.ofSeconds(1));
+		CompletionStage<Object> stage = Patterns.ask(m_system.getTupleSpace(), new Get(obsId), Duration.ofSeconds(1));
 		Optional<Triplet<Float,Float,Float>> triplet = null;
 		try {
 			triplet = (Optional<Triplet<Float,Float,Float>>)stage.toCompletableFuture().get();
 		}
 		catch ( Throwable e ) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			return null;
 		}
 		
 		return triplet.isPresent() ? triplet.get() : null;

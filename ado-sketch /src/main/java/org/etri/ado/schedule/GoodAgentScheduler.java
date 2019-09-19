@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
 import org.etri.ado.AgentSystem;
-import org.etri.ado.agent.TupleSpace;
+import org.etri.ado.agent.tuplespace.Get;
 import org.etri.ado.gateway.openai.OpenAI.Action;
 import org.javatuples.Pair;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -84,17 +84,17 @@ public class GoodAgentScheduler extends AbstractActor {
 		obs[0][2] = agent_loc.get().getValue0();
 		obs[0][3] = agent_loc.get().getValue1();
 		
-		Optional<Pair<Float, Float>> entity_loc = getObservation("agent2-loc");		
+		Optional<Pair<Float, Float>> entity_loc = getObservation("agent2-loc");
 		if ( !entity_loc.isPresent() ) return;
 		
 		obs[0][4] = entity_loc.get().getValue0() - obs[0][2];
 		obs[0][5] = entity_loc.get().getValue1() - obs[0][3];
 		
-		Optional<Pair<Float, Float>> other_loc = getObservation("agent1-loc");	
+		Optional<Pair<Float, Float>> other_loc = getObservation("agent1-loc");
 		if ( !other_loc.isPresent() ) return;
 		
 		obs[0][6] = other_loc.get().getValue0() - obs[0][2];
-		obs[0][7] = other_loc.get().getValue1() - obs[0][3];	
+		obs[0][7] = other_loc.get().getValue1() - obs[0][3];
 		
 		Optional<Pair<Float, Float>> other_vel = getObservation("agent1-velocity");
 		if ( !other_vel.isPresent() ) return;
@@ -117,7 +117,7 @@ public class GoodAgentScheduler extends AbstractActor {
 	@SuppressWarnings("unchecked")
 	private Optional<Pair<Float, Float>> getObservation(String obsId) {
 		
-		CompletionStage<Object> stage = Patterns.ask(m_system.getTupleSpace(), new TupleSpace.Get(obsId), Duration.ofSeconds(1000));
+		CompletionStage<Object> stage = Patterns.ask(m_system.getTupleSpace(), new Get(obsId), Duration.ofSeconds(1000));
 		Optional<Pair<Float, Float>> pair = null;
 		try {
 			pair = (Optional<Pair<Float, Float>>)stage.toCompletableFuture().get();
@@ -127,5 +127,5 @@ public class GoodAgentScheduler extends AbstractActor {
 		}
 		
 		return pair;
-	}	
+	}
 }

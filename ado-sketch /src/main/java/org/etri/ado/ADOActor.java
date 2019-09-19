@@ -1,7 +1,10 @@
 package org.etri.ado;
 
-import org.etri.ado.agent.AgentRegistry;
-import org.etri.ado.agent.TupleSpace;
+import org.etri.ado.agent.registry.message.GetAll;
+import org.etri.ado.agent.registry.message.GetByCapabilities;
+import org.etri.ado.agent.registry.message.GetById;
+import org.etri.ado.agent.registry.message.GetByRole;
+import org.etri.ado.agent.tuplespace.Get;
 
 import akka.actor.AbstractActor;
 import akka.actor.PoisonPill;
@@ -28,28 +31,33 @@ public class ADOActor extends AbstractActor {
 	@Override
 	public Receive createReceive() {
 		ReceiveBuilder builder = ReceiveBuilder.create();
-		builder.match(AgentRegistry.GetAll.class, this::receiveGetAll);
-		builder.match(AgentRegistry.GetById.class, this::receiveGetById);
-		builder.match(AgentRegistry.GetByCapabilities.class, this::receiveGetByCapabilities);
-		builder.match(TupleSpace.Get.class, this::receiveGetTuple);
+		builder.match(GetAll.class, this::receiveGetAll);
+		builder.match(GetById.class, this::receiveGetById);
+		builder.match(GetByRole.class, this::receiveGetByRole);
+		builder.match(GetByCapabilities.class, this::receiveGetByCapabilities);
+		builder.match(Get.class, this::receiveGetTuple);
 		builder.matchAny(this::unhandled);
 		
 		return builder.build();		
 	}
 	
-	private void receiveGetAll(AgentRegistry.GetAll cmd) {
+	private void receiveGetAll(GetAll cmd) {
 		m_system.getAgentRegistry().forward(cmd, getContext());
 	}	
 
-	private void receiveGetById(AgentRegistry.GetById cmd) {
-		m_system.getAgentRegistry().forward(cmd, getContext());
-	}
-		
-	private void receiveGetByCapabilities(AgentRegistry.GetByCapabilities cmd) {
+	private void receiveGetById(GetById cmd) {
 		m_system.getAgentRegistry().forward(cmd, getContext());
 	}
 	
-	private void receiveGetTuple(TupleSpace.Get cmd) {
+	private void receiveGetByRole(GetByRole cmd) {
+		m_system.getAgentRegistry().forward(cmd, getContext());
+	}	
+		
+	private void receiveGetByCapabilities(GetByCapabilities cmd) {
+		m_system.getAgentRegistry().forward(cmd, getContext());
+	}
+	
+	private void receiveGetTuple(Get cmd) {
 		m_system.getTupleSpace().forward(cmd, getContext());
 	}
 }

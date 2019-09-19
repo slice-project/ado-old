@@ -1,13 +1,13 @@
 package org.etri.ado;
 
+import org.etri.ado.actor.ActionCommander;
+import org.etri.ado.actor.LocationUpdater;
+import org.etri.ado.actor.VelocityUpdater;
 import org.etri.ado.device.emulator.ListenerEmulator;
 import org.etri.ado.device.emulator.RobotLocalizer;
 import org.etri.ado.device.emulator.RobotSpeedometer;
 import org.etri.ado.schedule.ConsoleInRouteBuilder;
 import org.etri.ado.schedule.ListenerScheduler;
-import org.etri.ado.task.ActionCommander;
-import org.etri.ado.task.LocationUpdater;
-import org.etri.ado.task.VelocityUpdater;
 import org.javatuples.Pair;
 
 import com.typesafe.config.Config;

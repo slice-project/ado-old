@@ -1,9 +1,9 @@
 package org.etri.ado.device.emulator;
 
-import org.etri.ado.task.ActionCommander.MoveDeltaXY;
-import org.etri.ado.task.ActionCommander.MoveToXY;
-import org.etri.ado.task.LocationUpdater.AddLocation;
-import org.etri.ado.task.VelocityUpdater.AddVelocity;
+import org.etri.ado.actor.ActionCommander.MoveDeltaXY;
+import org.etri.ado.actor.ActionCommander.MoveToXY;
+import org.etri.ado.actor.LocationUpdater.AddLocation;
+import org.etri.ado.actor.VelocityUpdater.AddVelocity;
 import org.javatuples.Pair;
 
 import akka.actor.AbstractActor;

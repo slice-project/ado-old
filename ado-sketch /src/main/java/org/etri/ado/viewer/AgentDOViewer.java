@@ -21,8 +21,5 @@ public class AgentDOViewer {
 
 		AgentDO ado = new AgentDO(clusterClient);
 		system.actorOf(ADORenderer.props(ado));
-
 	}
-
-
 }

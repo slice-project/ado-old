@@ -1,7 +1,7 @@
 package org.etri.ado.device.emulator;
 
+import org.etri.ado.actor.LocationUpdater.AddLocation;
 import org.etri.ado.device.AbstractSensor;
-import org.etri.ado.task.LocationUpdater.AddLocation;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;

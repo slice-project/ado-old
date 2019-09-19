@@ -3,6 +3,7 @@ package org.etri.ado.agent;
 import java.util.Set;
 
 import org.etri.ado.AgentSystem;
+import org.etri.ado.agent.registry.message.Remove;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
@@ -46,7 +47,7 @@ public class AgentRemover extends AbstractActor {
 		String removedId = null;
 		roles.stream().forEach(role -> {
 			if ( role.contains("id-" )) {
-				m_system.getAgentRegistry().tell(new AgentRegistry.Remove(role.substring(3)), getSelf());
+				m_system.getAgentRegistry().tell(new Remove(role.substring(3)), getSelf());
 			}
 		});
 		

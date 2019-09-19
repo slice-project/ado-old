@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
 import org.etri.ado.AgentSystem;
-import org.etri.ado.agent.TupleSpace;
+import org.etri.ado.agent.tuplespace.Get;
 import org.etri.ado.gateway.openai.OpenAI.Action;
 import org.javatuples.Pair;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -112,7 +112,7 @@ public class AdversaryScheduler extends AbstractActor {
 	@SuppressWarnings("unchecked")
 	private Pair<Float, Float> getObservation(String obsId) {
 		
-		CompletionStage<Object> stage = Patterns.ask(m_system.getTupleSpace(), new TupleSpace.Get(obsId), Duration.ofSeconds(1000));
+		CompletionStage<Object> stage = Patterns.ask(m_system.getTupleSpace(), new Get(obsId), Duration.ofSeconds(1000));
 		Optional<Pair<Float, Float>> pair = null;
 		try {
 			pair = (Optional<Pair<Float, Float>>)stage.toCompletableFuture().get();

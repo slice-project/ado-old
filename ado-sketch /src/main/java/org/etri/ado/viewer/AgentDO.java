@@ -5,8 +5,11 @@ import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import org.etri.ado.agent.AgentInfo;
-import org.etri.ado.agent.AgentRegistry;
-import org.etri.ado.agent.TupleSpace;
+import org.etri.ado.agent.registry.message.GetAll;
+import org.etri.ado.agent.registry.message.GetByCapabilities;
+import org.etri.ado.agent.registry.message.GetById;
+import org.etri.ado.agent.registry.message.GetByRole;
+import org.etri.ado.agent.tuplespace.Get;
 import org.javatuples.Pair;
 
 import akka.actor.ActorRef;
@@ -26,7 +29,7 @@ public class AgentDO {
 	
 	@SuppressWarnings("unchecked")
 	public Optional<AgentInfo> getAgentById(String agentId) {
-		SendToAll msg = new SendToAll(ADO_PATH, new AgentRegistry.GetById(agentId));
+		SendToAll msg = new SendToAll(ADO_PATH, new GetById(agentId));
 		CompletionStage<Object> getById = Patterns.ask(m_clusterClient, msg, Duration.ofSeconds(1));
 		Optional<AgentInfo> agentInfo = Optional.empty();
 		try {
@@ -37,8 +40,23 @@ public class AgentDO {
 		return agentInfo;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Optional<Set<AgentInfo>> getAgentByRole(String role) {
+		SendToAll msg = new SendToAll(ADO_PATH, new GetByRole(role));
+		CompletionStage<Object> getByRole = Patterns.ask(m_clusterClient, msg, Duration.ofSeconds(1));
+		
+		Optional<Set<AgentInfo>> agentInfos = Optional.empty();
+		try {		
+			agentInfos = (Optional<Set<AgentInfo>>)getByRole.toCompletableFuture().get();
+		}
+		catch ( Throwable ignored ) { }
+		
+		return agentInfos;
+	}
+	
+	
 	public AgentInfo[] getAgentAll() {
-		SendToAll msg = new SendToAll(ADO_PATH, new AgentRegistry.GetAll());
+		SendToAll msg = new SendToAll(ADO_PATH, new GetAll());
 		CompletionStage<Object> getAll = 
 				Patterns.ask(m_clusterClient, msg, Duration.ofSeconds(1));
 		
@@ -53,7 +71,7 @@ public class AgentDO {
 	
 	@SuppressWarnings("unchecked")
 	public Optional<Set<AgentInfo>> getAgentOf(String[] capas) {
-		SendToAll msg = new SendToAll(ADO_PATH, new AgentRegistry.GetByCapabilities(capas));
+		SendToAll msg = new SendToAll(ADO_PATH, new GetByCapabilities(capas));
 		CompletionStage<Object> getByCapa = 
 				Patterns.ask(m_clusterClient, msg, Duration.ofSeconds(1));
 		
@@ -67,9 +85,9 @@ public class AgentDO {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Optional<Pair<Float, Float>> getObservation(String obsId) {
+	public Optional<Pair<Float, Float>> getObservation(String agent, String obs) {
 		
-		SendToAll msg = new SendToAll(ADO_PATH, new TupleSpace.Get(obsId));
+		SendToAll msg = new SendToAll(ADO_PATH, new Get(agent, obs));
 		CompletionStage<Object> stage = Patterns.ask(m_clusterClient, msg, Duration.ofSeconds(1));
 		Optional<Pair<Float, Float>> pair = Optional.empty();
 		try {

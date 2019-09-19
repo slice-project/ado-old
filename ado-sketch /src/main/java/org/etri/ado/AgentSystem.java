@@ -1,9 +1,9 @@
 package org.etri.ado;
 
-import org.etri.ado.agent.AgentActor;
-import org.etri.ado.agent.AgentRegistry;
+import org.etri.ado.agent.AgentImpl;
 import org.etri.ado.agent.AgentRemover;
-import org.etri.ado.agent.TupleSpace;
+import org.etri.ado.agent.registry.AgentRegistry;
+import org.etri.ado.agent.tuplespace.TupleSpace;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -35,8 +35,8 @@ public class AgentSystem {
 		m_agentId = agentId;
 		
 		m_registry = system.actorOf(AgentRegistry.props());
-		m_tuples = system.actorOf(TupleSpace.props(system));
-		m_agent = system.actorOf(AgentActor.props(this));
+		m_tuples = system.actorOf(TupleSpace.props(agentId));
+		m_agent = system.actorOf(AgentImpl.props(this));
 		m_remover = system.actorOf(AgentRemover.props(this));
 	}
 	

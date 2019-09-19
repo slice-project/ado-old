@@ -1,13 +1,13 @@
 package org.etri.ado;
 
+import org.etri.ado.actor.ActionCommander;
+import org.etri.ado.actor.ActionUpdater;
+import org.etri.ado.actor.LocationUpdater;
 import org.etri.ado.device.emulator.ActionListener;
 import org.etri.ado.device.emulator.RobotLocalizer;
 import org.etri.ado.device.emulator.SpeakerEmulator;
 import org.etri.ado.schedule.ConsoleInRouteBuilder;
 import org.etri.ado.schedule.SpeakerScheduler;
-import org.etri.ado.task.ActionCommander;
-import org.etri.ado.task.ActionUpdater;
-import org.etri.ado.task.LocationUpdater;
 import org.javatuples.Pair;
 
 import com.typesafe.config.Config;
