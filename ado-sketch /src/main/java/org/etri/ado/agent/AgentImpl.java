@@ -3,7 +3,6 @@ package org.etri.ado.agent;
 import org.etri.ado.AgentSystem;
 import org.etri.ado.agent.registry.message.Put;
 import org.etri.ado.gateway.openai.OpenAI.Action;
-import org.javatuples.Tuple;
 
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
@@ -36,12 +35,6 @@ public class AgentImpl extends AbstractAgent {
 	
 	private void receiveAction(Action action) {
 		getContext().system().eventStream().publish(action);
-	}
-
-	@Override
-	public Tuple getObservation(String id) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
