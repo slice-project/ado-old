@@ -57,6 +57,6 @@ public class WorldSim extends Canvas {
 			System.out.println("ADDED : " + id);
 		});
 		
-		System.out.println("SIZE = " + m_agents.size());
+//		System.out.println("SIZE = " + m_agents.size());
 	}
 }

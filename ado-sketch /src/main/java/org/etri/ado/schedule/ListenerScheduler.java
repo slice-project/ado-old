@@ -2,7 +2,9 @@ package org.etri.ado.schedule;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +58,8 @@ public class ListenerScheduler extends AbstractActor {
 	private Pair<Float,Float> red_loc;
 	private Pair<Float,Float> green_loc;
 	private Pair<Float,Float> blue_loc;
+	
+	private Map<String, LWWMap<String,Tuple>> m_tuples = new HashMap<String, LWWMap<String,Tuple>>();
 		
 	public ListenerScheduler(AgentSystem system) {
 		m_system = system;
@@ -105,6 +109,7 @@ public class ListenerScheduler extends AbstractActor {
 	@SuppressWarnings("unchecked")
 	private void receiveChanged(Changed<LWWMap<String,Tuple>> g) {
 		String key = g.key().id();
+		m_tuples.put(key, g.dataValue());		
 		
 		if ( key.equals("agent0") ) {
 			Option<Tuple> changed = g.dataValue().get("action");
@@ -190,6 +195,12 @@ public class ListenerScheduler extends AbstractActor {
 		
 		Action action = Action.newBuilder().setCapability("MoveDeltaXY").addActions(deltaX).addActions(deltaY).build();
 		getContext().system().eventStream().publish(action);
+		
+		Tuple loc = getTuple("agent1", "loc");
+		System.out.println("#####" + loc);
+		
+		
+		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -222,5 +233,12 @@ public class ListenerScheduler extends AbstractActor {
 		}
 		
 		return triplet.isPresent() ? triplet.get() : null;
-	}	
+	}
+	
+	private Tuple getTuple(String agent, String id) {
+		LWWMap<String,Tuple> tuples = m_tuples.get(agent);
+		Option<Tuple> tuple = tuples.get(id);
+		
+		return tuple.get();
+	}		
 }
