@@ -49,7 +49,7 @@ public class GoodAgent0Scheduler extends AbstractActor {
 			m_model = KerasModelImport.importKerasModelAndWeights(simpleMlp);
 			
 			m_task = getContext().system().scheduler().schedule(FiniteDuration.Zero(), 
-					FiniteDuration.create(30, TimeUnit.MILLISECONDS), 
+					FiniteDuration.create(1000, TimeUnit.MILLISECONDS), 
 					getSelf(), 
 					s_tick, 
 					getContext().getDispatcher(), 
@@ -113,9 +113,7 @@ public class GoodAgent0Scheduler extends AbstractActor {
 		INDArray[] output = m_model.output(input);
 		
 		float deltaX = output[0].getFloat(1) - output[0].getFloat(2);
-		deltaX *= 3.0f;
 		float deltaY = output[0].getFloat(3) - output[0].getFloat(4);
-		deltaY *= 3.0f;
 		
 		Action action = Action.newBuilder().setCapability("MoveDeltaXY").addActions(deltaX).addActions(deltaY).build();
 		getContext().system().eventStream().publish(action);

@@ -53,6 +53,9 @@ public class GoodAgentEmulator extends AbstractActor {
 	}
 	
 	private void receiveActionForce(MoveDeltaXY force) {		
+		
+		log.info("received[MoveDeltaXY({}, {}]", force.delta.getValue0(), force.delta.getValue1());
+		
 		m_velX = m_velX * ( 1 - m_damping );		
 		m_velX += ( force.delta.getValue0() / m_mass ) * m_dt;
 		

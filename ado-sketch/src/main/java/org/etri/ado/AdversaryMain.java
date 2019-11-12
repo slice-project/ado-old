@@ -6,6 +6,7 @@ import org.etri.ado.actor.VelocityUpdater;
 import org.etri.ado.device.emulator.AdversaryEmulator;
 import org.etri.ado.device.emulator.RobotLocalizer;
 import org.etri.ado.device.emulator.RobotSpeedometer;
+import org.etri.ado.device.ros.ROSAgentDevice;
 import org.etri.ado.schedule.AdversaryScheduler;
 import org.javatuples.Pair;
 
@@ -29,7 +30,7 @@ public class AdversaryMain {
 		system.actorOf(RobotLocalizer.props(locationUpdater));
 		system.actorOf(RobotSpeedometer.props(velocityUpdater));	
 		
-		ActorRef robot = system.actorOf(AdversaryEmulator.prop(Pair.with(0.7f,0.7f)));
+		ActorRef robot = system.actorOf(ROSAgentDevice.prop("192.168.0.185"));
 		system.actorOf(ActionCommander.props(robot));
 		
 		system.actorOf(AdversaryScheduler.prop(system), "scheduler");

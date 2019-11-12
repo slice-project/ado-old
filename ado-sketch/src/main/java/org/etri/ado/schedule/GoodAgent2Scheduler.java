@@ -49,7 +49,7 @@ public class GoodAgent2Scheduler extends AbstractActor {
 			m_model = KerasModelImport.importKerasModelAndWeights(simpleMlp);
 			
 			m_task = getContext().system().scheduler().schedule(FiniteDuration.Zero(), 
-					FiniteDuration.create(30, TimeUnit.MILLISECONDS), 
+					FiniteDuration.create(1000, TimeUnit.MILLISECONDS), 
 					getSelf(), 
 					s_tick, 
 					getContext().getDispatcher(), 
