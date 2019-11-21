@@ -29,17 +29,19 @@ public class GoodAgent1Scheduler extends AbstractActor {
 	
 	private final LoggingAdapter m_log = Logging.getLogger(getContext().system(), this);	
 	
-	public static Props prop(AgentSystem system) {
-		return Props.create(GoodAgent1Scheduler.class, system);
+	public static Props prop(AgentSystem system, long interval) {
+		return Props.create(GoodAgent1Scheduler.class, system, interval);
 	}
 
 	private static final Tick s_tick = new Tick();
 	private final AgentSystem m_system;
 	private ComputationGraph m_model;
 	private Cancellable m_task;
+	private final long m_interval;
 		
-	public GoodAgent1Scheduler(AgentSystem system) {
+	public GoodAgent1Scheduler(AgentSystem system, long interval) {
 		m_system = system;
+		m_interval = interval;
 	}
 	
 	@Override
@@ -49,7 +51,7 @@ public class GoodAgent1Scheduler extends AbstractActor {
 			m_model = KerasModelImport.importKerasModelAndWeights(simpleMlp);
 			
 			m_task = getContext().system().scheduler().schedule(FiniteDuration.Zero(), 
-					FiniteDuration.create(1000, TimeUnit.MILLISECONDS), 
+					FiniteDuration.create(m_interval, TimeUnit.MILLISECONDS), 
 					getSelf(), 
 					s_tick, 
 					getContext().getDispatcher(), 

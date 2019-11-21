@@ -30,9 +30,16 @@ public class GoodAgent2Main {
 		system.actorOf(RobotLocalizer.props(locationUpdater));
 		system.actorOf(RobotSpeedometer.props(velocityUpdater));	
 		
-		ActorRef robot = system.actorOf(ROSAgentDevice.prop("192.168.0.198"));
-		system.actorOf(ActionCommander.props(robot));
-		
-		system.actorOf(GoodAgent2Scheduler.prop(system), "scheduler");			
+		ActorRef robot = null;
+		long interval = 1000;
+		if ( args.length > 0 ) {
+			robot = system.actorOf(GoodAgentEmulator.prop(Pair.with(1f, -1f)));
+		}
+		else {
+			robot = system.actorOf(ROSAgentDevice.prop("192.168.0.198"));
+		}
+
+		system.actorOf(ActionCommander.props(robot));		
+		system.actorOf(GoodAgent2Scheduler.prop(system, interval), "scheduler");			
 	}
 }

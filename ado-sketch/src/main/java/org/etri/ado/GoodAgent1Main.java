@@ -2,6 +2,7 @@ package org.etri.ado;
 import org.etri.ado.actor.ActionCommander;
 import org.etri.ado.actor.LocationUpdater;
 import org.etri.ado.actor.VelocityUpdater;
+import org.etri.ado.device.emulator.GoodAgentEmulator;
 import org.etri.ado.device.emulator.RobotLocalizer;
 import org.etri.ado.device.emulator.RobotSpeedometer;
 import org.etri.ado.device.ros.ROSAgentDevice;
@@ -28,9 +29,16 @@ public class GoodAgent1Main {
 		system.actorOf(RobotLocalizer.props(locationUpdater));
 		system.actorOf(RobotSpeedometer.props(velocityUpdater));	
 		
-		ActorRef robot = system.actorOf(ROSAgentDevice.prop("192.168.0.195"));
-		system.actorOf(ActionCommander.props(robot));
+		ActorRef robot = null;
+		long interval = 1000;
+		if ( args.length > 0 ) {
+			robot = system.actorOf(GoodAgentEmulator.prop(Pair.with(-1f, -1f)));
+		}
+		else {
+			robot = system.actorOf(ROSAgentDevice.prop("192.168.0.187"));
+		}
 		
-		system.actorOf(GoodAgent1Scheduler.prop(system), "scheduler");
+		system.actorOf(ActionCommander.props(robot));
+		system.actorOf(GoodAgent1Scheduler.prop(system, interval), "scheduler");
 	}
 }

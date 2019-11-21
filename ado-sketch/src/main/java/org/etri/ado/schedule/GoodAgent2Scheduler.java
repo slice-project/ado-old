@@ -29,17 +29,19 @@ public class GoodAgent2Scheduler extends AbstractActor {
 	
 	private final LoggingAdapter m_log = Logging.getLogger(getContext().system(), this);	
 	
-	public static Props prop(AgentSystem system) {
-		return Props.create(GoodAgent2Scheduler.class, system);
+	public static Props prop(AgentSystem system, long interval) {
+		return Props.create(GoodAgent2Scheduler.class, system, interval);
 	}
 
 	private static final Tick s_tick = new Tick();
 	private final AgentSystem m_system;
 	private ComputationGraph m_model;
 	private Cancellable m_task;
+	private final long m_interval;
 		
-	public GoodAgent2Scheduler(AgentSystem system) {
+	public GoodAgent2Scheduler(AgentSystem system, long interval) {
 		m_system = system;
+		m_interval = interval;
 	}
 	
 	@Override
@@ -49,7 +51,7 @@ public class GoodAgent2Scheduler extends AbstractActor {
 			m_model = KerasModelImport.importKerasModelAndWeights(simpleMlp);
 			
 			m_task = getContext().system().scheduler().schedule(FiniteDuration.Zero(), 
-					FiniteDuration.create(1000, TimeUnit.MILLISECONDS), 
+					FiniteDuration.create(m_interval, TimeUnit.MILLISECONDS), 
 					getSelf(), 
 					s_tick, 
 					getContext().getDispatcher(), 
@@ -113,9 +115,7 @@ public class GoodAgent2Scheduler extends AbstractActor {
 		INDArray[] output = m_model.output(input);
 		
 		float deltaX = output[0].getFloat(1) - output[0].getFloat(2);
-		deltaX *= 3.0f;
 		float deltaY = output[0].getFloat(3) - output[0].getFloat(4);
-		deltaY *= 3.0f;
 		
 		Action action = Action.newBuilder().setCapability("MoveDeltaXY").addActions(deltaX).addActions(deltaY).build();
 		getContext().system().eventStream().publish(action);

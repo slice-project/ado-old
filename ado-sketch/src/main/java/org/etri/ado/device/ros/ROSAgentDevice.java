@@ -21,9 +21,13 @@ import ros.tools.MessageUnpacker;
 public class ROSAgentDevice extends AbstractActor {
 		
 	private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+	private static final float SCALE = 1.0f / 6.0f ;
+	private static final float BORDER = 2.0f;
 	
 	private final RosBridge m_ros = new RosBridge();
 	private final String m_host;
+	private float m_xPos;
+	private float m_yPos;
 	
 	public static Props prop(String host) {
 		return Props.create(ROSAgentDevice.class, host);
@@ -54,7 +58,9 @@ public class ROSAgentDevice extends AbstractActor {
 				public void receive(JsonNode data, String stringRep) {
 					MessageUnpacker<Vector3> unpacker = new MessageUnpacker<Vector3>(Vector3.class);
 					Vector3 msg = unpacker.unpackRosMessage(data);
-					getContext().system().eventStream().publish(new AddLocation(Pair.with((float)msg.x, (float)msg.y)));
+					m_xPos = (float)msg.x;
+					m_yPos = (float)msg.y;
+					getContext().system().eventStream().publish(new AddLocation(Pair.with(m_xPos, m_yPos)));
 					log.debug("publish[AddLocation({}, {}]", msg.x, msg.y);				
 				}
 			}
@@ -92,11 +98,20 @@ public class ROSAgentDevice extends AbstractActor {
 	
 	private void receiveActionForce(MoveDeltaXY force) {
 		
-		float deltaX = force.delta.getValue0();
-		float deltaY = force.delta.getValue1();
-		log.info("received[MoveDeltaXY({}, {}]", deltaX, deltaY);	
+		float deltaX = force.delta.getValue0() * SCALE;
+		float deltaY = force.delta.getValue1() * SCALE;
+		log.info("received[MoveDeltaXY({}, {}]", deltaX, deltaY);
+		
+		if ( Math.abs(m_xPos + deltaX) > BORDER ) {
+			deltaX =  -deltaX;
+		}
+		
+		if ( Math.abs(m_yPos + deltaY) > BORDER ) {
+			deltaY = -deltaY;
+		}
 		
 		Vector3 delta = new Vector3(deltaX, deltaY, 0);
 		m_ros.publish("/waffle/move_delta",  "geometry_msgs/Vector3", delta);
+		log.info("MOVE : ({},{}) => ({},{})", m_xPos, m_yPos, m_xPos + deltaX, m_yPos + deltaY);
 	}
 }

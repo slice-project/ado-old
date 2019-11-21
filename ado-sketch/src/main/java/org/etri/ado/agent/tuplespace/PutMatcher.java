@@ -62,7 +62,7 @@ public class PutMatcher <T extends Tuple> extends AbstractActor {
 	private Receive matchOther() {
 		return receiveBuilder().match(UpdateSuccess.class, u -> {
 			 Put.Context<Tuple> ctx = (Put.Context<Tuple>) u.getRequest().get();
-			 logger.info("inserted : " + m_dataKey.id()  + "-" + ctx.tuple.getKey() + ctx.tuple.getValue());
+			 logger.debug("inserted : " + m_dataKey.id()  + "-" + ctx.tuple.getKey() + ctx.tuple.getValue());
 		}).match(UpdateTimeout.class, t -> {
 			// will eventually be replicated
 		}).match(UpdateFailure.class, f -> {

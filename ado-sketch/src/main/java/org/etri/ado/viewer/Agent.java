@@ -11,9 +11,10 @@ import org.javatuples.Pair;
 
 public class Agent {
 	
-	private static final float Scale = 350f;
-	public static final int WIDTH = 1024;
-	public static final int HEIGHT = 648; 
+	private static final float Scale = 310f;
+	private static final int OFFSET = 10;
+	public static final int WIDTH = 640;
+	public static final int HEIGHT = 660; 
 	
 	private final String m_id;
 	private final Color m_color;
@@ -52,12 +53,31 @@ public class Agent {
 		}
 		
 		g.setColor(m_color);
-		g.fillOval(m_loc.x + WIDTH, HEIGHT - m_loc.y, 80, 80);
+		g.fillOval((m_loc.x - 40) + WIDTH, HEIGHT - (m_loc.y + 40), 80, 80);
+		
+		Point upperLeft = getPoint(-2, 2); 
+		Point upperRight = getPoint(2, 2);
+		Point lowerLeft = getPoint(-2, -2);
+		Point lowerRight = getPoint(2, -2);
+		
+		g.setColor(Color.BLACK);
+		g.drawLine(upperLeft.x, upperLeft.y, upperRight.x, upperRight.y);
+		g.drawLine(upperLeft.x, upperLeft.y, lowerLeft.x, lowerLeft.y);
+		g.drawLine(lowerLeft.x, lowerLeft.y, lowerRight.x, lowerRight.y);
+		g.drawLine(upperRight.x, upperRight.y, lowerRight.x, lowerRight.y);
 	}
 		
 	public synchronized void setLocation(Pair<Float,Float> loc) {
 		int x = (int) (loc.getValue0().floatValue() * Scale);
-		int y = (int) (loc.getValue1().floatValue() * Scale);
+		int y = (int) (loc.getValue1().floatValue() * Scale) + OFFSET;
 		m_loc = new Point(x, y);
-	}	
+	}
+	
+	private Point getPoint(int x, int y) {
+		Point pt = new Point(x * (int)Scale, y * (int)Scale + OFFSET);
+		pt.x = pt.x + WIDTH;
+		pt.y = HEIGHT - pt.y;
+		
+		return pt;
+	}
 }

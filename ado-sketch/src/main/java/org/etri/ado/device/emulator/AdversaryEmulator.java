@@ -21,7 +21,7 @@ public class AdversaryEmulator extends AbstractActor {
 	private float m_velX = 0f;
 	private float m_velY = 0f;
 	private final float m_mass = 1.0f;
-	private final float m_dt = 0.03f;
+	private final float m_dt = 0.1f;
 	private final float m_damping = 0.25f;
 	private final float m_max_speed = 1.3f;
 	

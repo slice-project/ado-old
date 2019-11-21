@@ -11,6 +11,7 @@ import org.etri.ado.actor.VelocityUpdater;
 import org.etri.ado.device.emulator.AdversaryEmulator;
 import org.etri.ado.device.emulator.RobotLocalizer;
 import org.etri.ado.device.emulator.RobotSpeedometer;
+import org.etri.ado.device.ros.ROSAgentDevice;
 import org.javatuples.Pair;
 
 import com.typesafe.config.Config;
@@ -73,8 +74,14 @@ public class PreyAgentMain implements KeyListener {
 		system.actorOf(RobotLocalizer.props(locationUpdater));
 		system.actorOf(RobotSpeedometer.props(velocityUpdater));	
 		
-		ActorRef robot = system.actorOf(AdversaryEmulator.prop(Pair.with(0.7f, 0.7f)));
-
+		ActorRef robot = null;
+		if ( args.length > 0 ) {
+			robot = system.actorOf(AdversaryEmulator.prop(Pair.with(1f, 1f)));
+		}
+		else {
+			robot = system.actorOf(ROSAgentDevice.prop("192.168.0.185"));
+		}
+		
 		JFrame f = new JFrame();
 		f.setSize(300,200);
 		f.setLayout(null);
