@@ -81,11 +81,11 @@ public class PreyAgentMain implements KeyListener {
 		else {
 			robot = system.actorOf(ROSAgentDevice.prop("127.0.0.1"));
 		}
-		
-		JFrame f = new JFrame();
-		f.setSize(300,200);
-		f.setLayout(null);
-		f.setVisible(true);
-		f.addKeyListener(new PreyAgentMain(robot));		
+//		
+//		JFrame f = new JFrame();
+//		f.setSize(300,200);
+//		f.setLayout(null);
+//		f.setVisible(true);
+//		f.addKeyListener(new PreyAgentMain(robot));		
 	}
 }
