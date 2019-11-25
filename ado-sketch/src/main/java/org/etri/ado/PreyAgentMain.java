@@ -79,7 +79,7 @@ public class PreyAgentMain implements KeyListener {
 			robot = system.actorOf(AdversaryEmulator.prop(Pair.with(1f, 1f)));
 		}
 		else {
-			robot = system.actorOf(ROSAgentDevice.prop("192.168.0.185"));
+			robot = system.actorOf(ROSAgentDevice.prop("127.0.0.1"));
 		}
 		
 		JFrame f = new JFrame();

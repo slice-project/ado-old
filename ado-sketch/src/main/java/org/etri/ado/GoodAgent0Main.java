@@ -36,7 +36,7 @@ public class GoodAgent0Main {
 			robot = system.actorOf(GoodAgentEmulator.prop(Pair.with(-1f, 1f)));	
 		}
 		else {
-			robot = system.actorOf(ROSAgentDevice.prop("192.168.0.195"));
+			robot = system.actorOf(ROSAgentDevice.prop("127.0.0.1"));
 		}
 		
 		system.actorOf(ActionCommander.props(robot));		
