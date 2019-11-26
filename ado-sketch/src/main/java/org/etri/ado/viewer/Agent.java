@@ -28,8 +28,8 @@ public class Agent {
 	
 	static {
 		s_colorMap.put("agent0", Color.RED);
-		s_colorMap.put("agent1", Color.GREEN);
-		s_colorMap.put("agent2", Color.BLUE);
+		s_colorMap.put("agent1", Color.RED);
+		s_colorMap.put("agent2", Color.RED);
 	}
 	
 	public Agent(String id) {

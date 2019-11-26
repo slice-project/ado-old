@@ -31,7 +31,7 @@ public class GoodAgent2Main {
 		system.actorOf(RobotSpeedometer.props(velocityUpdater));	
 		
 		ActorRef robot = null;
-		long interval = 1000;
+		long interval = 500;
 		if ( args.length > 0 ) {
 			robot = system.actorOf(GoodAgentEmulator.prop(Pair.with(1f, -1f)));
 		}
