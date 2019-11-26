@@ -54,6 +54,7 @@ public class Agent {
 		
 		g.setColor(m_color);
 		g.fillOval((m_loc.x - 40) + WIDTH, HEIGHT - (m_loc.y + 40), 80, 80);
+		g.drawString(m_id, (m_loc.x - 40) + WIDTH, HEIGHT - (m_loc.y + 40));
 		
 		Point upperLeft = getPoint(-2, 2); 
 		Point upperRight = getPoint(2, 2);
