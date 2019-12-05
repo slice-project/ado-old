@@ -1,6 +1,7 @@
 package org.etri.ado.viewer;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.HashMap;
@@ -27,9 +28,10 @@ public class Agent {
 	private static int Index = s_rand.nextInt(8);
 	
 	static {
-		s_colorMap.put("agent0", Color.RED);
-		s_colorMap.put("agent1", Color.RED);
-		s_colorMap.put("agent2", Color.RED);
+		s_colorMap.put("predator1", Color.BLUE);
+		s_colorMap.put("predator2", Color.BLUE);
+		s_colorMap.put("predator3", Color.BLUE);
+		s_colorMap.put("prey", Color.RED);
 	}
 	
 	public Agent(String id) {
@@ -61,7 +63,8 @@ public class Agent {
 		Point lowerRight = getPoint(2, -2);
 		
 		g.setColor(Color.BLACK);
-		g.drawString(m_id, (m_loc.x - 40) + WIDTH, HEIGHT - (m_loc.y + 40));
+		g.setFont(new Font("굴림", Font.BOLD, 20));
+		g.drawString(m_id, (m_loc.x - 42) + WIDTH, HEIGHT - (m_loc.y + 45));
 		g.drawLine(upperLeft.x, upperLeft.y, upperRight.x, upperRight.y);
 		g.drawLine(upperLeft.x, upperLeft.y, lowerLeft.x, lowerLeft.y);
 		g.drawLine(lowerLeft.x, lowerLeft.y, lowerRight.x, lowerRight.y);
