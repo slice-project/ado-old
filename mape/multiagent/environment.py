@@ -217,8 +217,9 @@ class MultiAgentEnv(gym.Env):
                     if np.all(other.state.c == 0):
                         word = '_'
                     else:
-                        print(other.state.c)
                         index = np.argmax(other.state.c)
+                        if other.state.c[index] < 0.8: continue
+                        print(other.state.c)
                         word = alphabet[np.argmax(other.state.c)]
                     message += (other.name + ' to ' + agent.name + ': ' + word + '   ')
             print(message)
