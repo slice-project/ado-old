@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
 import org.etri.ado.AgentSystem;
+import org.etri.ado.agent.cp.CollaborationPolicy;
 import org.etri.ado.agent.tuplespace.Get;
 import org.etri.ado.gateway.openai.OpenAI.Action;
 import org.javatuples.Pair;
@@ -38,6 +39,8 @@ public class GoodAgent0Scheduler extends AbstractActor {
 	private ComputationGraph m_model;
 	private Cancellable m_task;
 	private final long m_interval; 
+	
+	private CollaborationPolicy m_policy;
 		
 	public GoodAgent0Scheduler(AgentSystem system, long interval) {
 		m_system = system;
@@ -103,7 +106,6 @@ public class GoodAgent0Scheduler extends AbstractActor {
 		
 		obs[0][8] = agent3_loc.get().getValue0() - obs[0][2];
 		obs[0][9] = agent3_loc.get().getValue1() - obs[0][3];		
-		
 		
 		Optional<Pair<Float, Float>> agent3_vel = getObservation("agent3-velocity");
 		if ( !agent3_vel.isPresent() ) return;
